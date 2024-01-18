@@ -1,0 +1,2 @@
+rootProject.name = "Mood-Me-AR"
+include ':app'
