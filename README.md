@@ -72,3 +72,23 @@ faces.forEach { face ->
         android:required="true" />
 ```
 [**more...**](https://github.com/consolecode-hub/Mood-Me-AR/blob/master/app/src/main/AndroidManifest.xml)
+
+
+##Fill Access
+
+![Screenshot_20240118-152734](https://github.com/consolecode-hub/Mood-Me-AR/assets/3745464/b09d452b-3812-4d46-98b3-8c27891ba2bb)
+
+## Allow app to take pichtues and record videos 
+
+![Screenshot_20240118-152636](https://github.com/consolecode-hub/Mood-Me-AR/assets/3745464/ede742fe-c767-45ba-94f1-841d3551b3a3)
+
+
+## Screenshots
+![Screenshot_20240118-153605](https://github.com/consolecode-hub/Mood-Me-AR/assets/3745464/ea3e070f-4ef3-4b70-8ee3-bcfd0ef4e328)
+![Screenshot_20240118-152727](https://github.com/consolecode-hub/Mood-Me-AR/assets/3745464/515e5678-5499-430d-88ff-1bf6a4a44183)
+![Screenshot_20240118-152658](https://github.com/consolecode-hub/Mood-Me-AR/assets/3745464/969e3a83-1f3d-4f3f-9157-b183fa3b78b7)
+![Screenshot_20240118-154728](https://github.com/consolecode-hub/Mood-Me-AR/assets/3745464/f7e93e0b-4b69-4517-93ac-dd27510e00a1)
+![Screenshot_20240118-153452](https://github.com/consolecode-hub/Mood-Me-AR/assets/3745464/95f2a3e6-9131-4355-a18f-369c8c987373)
+![Screenshot_20240118-153445](https://github.com/consolecode-hub/Mood-Me-AR/assets/3745464/6d8a4dc8-9da4-4a1b-97b9-b867efe1aa36)
+
+
