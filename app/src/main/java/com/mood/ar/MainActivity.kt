@@ -10,23 +10,20 @@ import android.content.pm.PackageManager
 import android.media.CamcorderProfile
 import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.view.View
+import android.widget.EditText
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.snackbar.Snackbar
 import com.google.ar.core.ArCoreApk
 import com.google.ar.core.AugmentedFace
 import com.google.ar.core.RecordingStatus
 import com.google.ar.core.TrackingState
 import com.google.ar.core.exceptions.RecordingFailedException
-import com.google.ar.sceneform.rendering.ModelRenderable
 import com.google.ar.sceneform.rendering.Renderable
 import com.google.ar.sceneform.rendering.Texture
 import com.google.ar.sceneform.ux.AugmentedFaceNode
@@ -34,11 +31,10 @@ import com.mood.ar.FaceModal.Constants
 import com.mood.ar.FaceModal.CustomFaceNode
 import com.mood.ar.FaceModal.FaceModalDialog
 import com.mood.ar.FaceModal.FaceModel
-import com.mood.ar.FaceModal.MediaItemAdapter
+import com.mood.ar.MyAPI.FileUpload
 import com.mood.ar.Recoder.VideoRecorder
 import com.mood.ar.databinding.ActivityMainBinding
 
-import com.mood.ar.MyAPI.FileUpload
 
 class MainActivity : AppCompatActivity(){
 
@@ -164,9 +160,9 @@ class MainActivity : AppCompatActivity(){
         }
 
         binding.photoButton.setOnClickListener {
-            videoRecorder!!.takePhoto(arFragment)
+           // videoRecorder!!.takePhoto(arFragment)
 
-            Toast.makeText(view.getContext(), "\uD83D\uDCF7 Successfully Captured!",   Toast.LENGTH_SHORT).show();
+            popUpTagEditText(videoRecorder!!.takePhoto(this@MainActivity, arFragment))
         }
 
         binding.galleryBtn.setOnClickListener {
@@ -246,14 +242,74 @@ class MainActivity : AppCompatActivity(){
         builder.setMessage("Are you sure you want to upload to the server?")
             .setCancelable(false)
             .setPositiveButton("Yes") { dialog, id ->
-                FileUpload(context).uploadFILE(uri)
+                dialog.dismiss()
+               // FileUpload(context).uploadFILE(uri)
+
             }
             .setNegativeButton("No") { dialog, id ->
                 // Dismiss the dialog
                 dialog.dismiss()
             }
         val alert = builder.create()
-        alert.show()
+        builder.show()
+    }
+
+    private fun popUpVideoTagEditText() {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Tag:")
+        val input = EditText(this)
+        val lp = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.MATCH_PARENT
+        )
+        input.layoutParams = lp
+        builder.setView(input)
+
+        // Set up the buttons
+        builder.setPositiveButton("Save") { dialog, which ->
+            // do something here on OK
+
+            this.contentResolver.query(videoRecorder!!.getVideoURI(this), arrayOf(MediaStore.Video.Media.DURATION), null, null, null)?.use {
+                val durationColumn = it.getColumnIndexOrThrow(MediaStore.Video.Media.DURATION)
+                it.moveToFirst()
+
+                FileUpload(applicationContext).uploadFILE(videoRecorder!!.getVideoURI(this),  input.text.toString(), it.getLong(durationColumn).toString())
+            }
+
+            Toast.makeText(applicationContext, "\uD83D\uDCF7 Successfully Captured!",   Toast.LENGTH_SHORT).show()
+            dialog.dismiss()
+        }
+        builder.setNegativeButton(
+            "Cancel"
+        ) { dialog, which -> dialog.dismiss() }
+        builder.show()
+    }
+
+    private fun popUpTagEditText(uri: Uri?) {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Tag:")
+        val input = EditText(this)
+        val lp = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.MATCH_PARENT
+        )
+        input.layoutParams = lp
+        builder.setView(input)
+
+        // Set up the buttons
+        builder.setPositiveButton("Save") { dialog, which ->
+            // do something here on OK
+            if (uri != null) {
+                FileUpload(applicationContext).uploadFILE(uri, input.text.toString(),"")
+            }
+
+                Toast.makeText(applicationContext, "\uD83D\uDCF7 Successfully Captured!",   Toast.LENGTH_SHORT).show()
+            dialog.dismiss()
+        }
+        builder.setNegativeButton(
+            "Cancel"
+        ) { dialog, which -> dialog.dismiss() }
+        builder.show()
     }
 
     /** Performs action when stop_recording button is clicked.  */
@@ -267,10 +323,14 @@ class MainActivity : AppCompatActivity(){
             else {
                 binding.startRecordingButton.setVisibility(View.VISIBLE);
                 binding.stopRecordingButton.setVisibility(View.GONE);
-                val videoPath = videoRecorder!!.videoPath.absolutePath
+                //val videoPath = videoRecorder!!.videoPath.absolutePath
              //   uploadFile(this, Uri.fromFile(videoRecorder!!.videoPath));
+
+                 //   popUpVideoTagEditText()
+
             }
             arFragment.arSceneView.session!!.stopRecording()
+            popUpVideoTagEditText()
         } catch (e: RecordingFailedException) {
             val errorMessage = "Failed to stop recording. $e"
             Log.e(TAG, errorMessage, e)

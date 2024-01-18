@@ -5,6 +5,7 @@ import android.app.Dialog
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
@@ -25,6 +26,7 @@ import com.mood.ar.MediaLoder.printIt
 import com.mood.ar.MyAPI.FileUpload
 import com.mood.ar.databinding.FolderViewBinding
 import com.mood.ar.databinding.ItemViewBinding
+import java.io.File
 
 
 open class AllFilesRecyclerAdapterX : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -61,7 +63,7 @@ open class AllFilesRecyclerAdapterX : RecyclerView.Adapter<RecyclerView.ViewHold
                 }
                 holder.itemView.setOnLongClickListener {
 
-                    upload(context, item.uri);
+                    upload(context, item.uri,"","");
                     true
                 }
 
@@ -99,7 +101,7 @@ open class AllFilesRecyclerAdapterX : RecyclerView.Adapter<RecyclerView.ViewHold
                 }
 
                 holder.itemView.setOnLongClickListener {
-                    upload(context, item.uri);
+                    upload(context, item.uri,"","");
                     true
                 }
             }
@@ -130,13 +132,18 @@ open class AllFilesRecyclerAdapterX : RecyclerView.Adapter<RecyclerView.ViewHold
     }
 }
 
-fun upload(context: Context, uri : Uri) {
-    val dialog = Dialog(context)
+fun upload(context: Context, uri : Uri, tag: String, duration: String) {
+
     val builder = AlertDialog.Builder(context)
     builder.setMessage("Are you sure you want to upload to the server?")
         .setCancelable(false)
         .setPositiveButton("Yes") { dialog, id ->
-            FileUpload(context).uploadFILE(uri)
+            context.contentResolver.query(uri, arrayOf(MediaStore.Video.Media.DURATION), null, null, null)?.use {
+                val durationColumn = it.getColumnIndexOrThrow(MediaStore.Video.Media.DURATION)
+                it.moveToFirst()
+                FileUpload(context).uploadFILE(uri,tag,it.getLong(durationColumn).toString())
+            }
+
         }
         .setNegativeButton("No") { dialog, id ->
             // Dismiss the dialog
@@ -145,8 +152,6 @@ fun upload(context: Context, uri : Uri) {
     val alert = builder.create()
     alert.show()
 }
-
-
 
 open class AllFolderRecyclerAdapterX : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 

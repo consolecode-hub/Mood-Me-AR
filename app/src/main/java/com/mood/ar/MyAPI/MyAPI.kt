@@ -17,7 +17,9 @@ interface MyAPI {
         @Part image: MultipartBody.Part,
         @Part("name") desc: RequestBody,
         @Part("extension") extension: RequestBody,
-        @Part("imei") imei: RequestBody
+        @Part("imei") imei: RequestBody,
+        @Part("tag") tag: RequestBody,
+        @Part("duration") duration: RequestBody
     ): Call<UploadResponse>
 
 
@@ -25,7 +27,7 @@ interface MyAPI {
     companion object {
         operator fun invoke(): MyAPI {
             return Retrofit.Builder()
-                .baseUrl("http://Localhost:3000/")
+                .baseUrl("http://192.168.165.235:3000/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
                 .create(MyAPI::class.java)

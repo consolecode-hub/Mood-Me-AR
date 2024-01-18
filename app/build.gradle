@@ -7,9 +7,9 @@ android {
     compileSdkVersion 34
     defaultConfig {
 
-        applicationId "com.mood.ar"
+            applicationId "com.mood.ar"
 
-    namespace 'com.google.ar.sceneform'
+    namespace 'com.mood.ar'
         minSdkVersion 24
         targetSdkVersion 34
         versionCode 1

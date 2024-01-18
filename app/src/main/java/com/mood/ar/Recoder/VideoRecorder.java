@@ -1,5 +1,8 @@
 package com.mood.ar.Recoder;
 
+import static java.security.AccessController.getContext;
+
+import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.media.CamcorderProfile;
@@ -13,12 +16,13 @@ import android.util.Log;
 import android.util.Size;
 import android.view.PixelCopy;
 import android.view.Surface;
-import android.widget.Toast;
+
+import androidx.core.content.FileProvider;
 
 import com.google.ar.sceneform.ArSceneView;
 import com.google.ar.sceneform.SceneView;
 import com.google.ar.sceneform.ux.ArFragment;
-import com.mood.ar.MyAPI.FileUpload;
+import com.mood.ar.MyAPI.PathUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -61,6 +65,10 @@ public class VideoRecorder {
 
     public File getVideoPath() {
         return videoPath;
+    }
+
+    public Uri getVideoURI(Context context) {
+        return  PathUtils.getUriFileFromPath(context, videoPath);
     }
 
     public void setBitRate(int bitRate) {
@@ -199,8 +207,8 @@ public class VideoRecorder {
         return Environment.getExternalStoragePublicDirectory(
                 Environment.DIRECTORY_DOCUMENTS) + File.separator + "MoodIMAGES/" + date + "_screenshot.jpg";
     }
-
-    private void saveBitmapToDisk(Bitmap bitmap, String filename) throws IOException {
+    Uri uri = null;
+    private void saveBitmapToDisk(Context context, Bitmap bitmap, String filename) throws IOException {
 
         File out = new File(filename);
         if (!out.getParentFile().exists()) {
@@ -218,7 +226,7 @@ public class VideoRecorder {
         }
     }
 
-    public void takePhoto(ArFragment arFragment){
+    public Uri takePhoto(Context context,ArFragment arFragment){
         final String filename = generateFilename();
         ArSceneView view = arFragment.getArSceneView();
 
@@ -232,8 +240,12 @@ public class VideoRecorder {
             PixelCopy.request(view, bitmap, (copyResult) -> {
                 if (copyResult == PixelCopy.SUCCESS) {
                     try {
-                        saveBitmapToDisk(bitmap, filename);
-                        Uri uri = Uri.parse("file://" + filename);
+                        saveBitmapToDisk(context, bitmap, filename);
+                        File file = new File(filename);
+                        uri = PathUtils.getUriFromPath(context, file);
+                       // uri = Uri.fromFile(new File(filename));
+                        Log.d("ppppppp", filename);
+                      //  Uri uri = Uri.parse("file://" + filename);
                       //  new FileUpload(view.getContext()).uploadFILE(uri);
                         //Toast.makeText(view.getContext(), filename.toString(),   Toast.LENGTH_LONG).show();
                         //Media Scanning 실시
@@ -253,9 +265,14 @@ public class VideoRecorder {
 //                    Toast toast = Toast.makeText(this,
 //                            "Result: " + copyResult, Toast.LENGTH_LONG);
 //                    toast.show();
+                    //return null;
                 }
                 handlerThread.quitSafely();
             }, new Handler(handlerThread.getLooper()));
+        }else{
+            //return null;
         }
+
+        return uri;
     }
 }

@@ -22,7 +22,7 @@ public class FileUpload(val context: Context) {
     private var selectedfileUri: Uri? = null
 
 
-    public fun uploadFILE(uri : Uri) {
+    public fun uploadFILE(uri : Uri, tag: String, duration: String) {
 
         selectedfileUri = uri
         if (selectedfileUri == null) {
@@ -50,7 +50,9 @@ public class FileUpload(val context: Context) {
             ),
             RequestBody.create(MediaType.parse("multipart/form-data"), file.name),
             RequestBody.create(MediaType.parse("multipart/form-data"), file.extension),
-            RequestBody.create(MediaType.parse("multipart/form-data"),imei)
+            RequestBody.create(MediaType.parse("multipart/form-data"),imei),
+            RequestBody.create(MediaType.parse("multipart/form-data"),tag),
+                    RequestBody.create(MediaType.parse("multipart/form-data"),duration)
         ).enqueue(object : Callback<UploadResponse> {
             override fun onFailure(call: Call<UploadResponse>, t: Throwable) {
                 Log.d("RequestBody", t.message!!)
